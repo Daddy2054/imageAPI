@@ -1,0 +1,35 @@
+{
+  "name": "fsjd_image_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "prettier": "prettier --config .prettierrc \"**/*.js\" --write",
+    "lint": "eslint --config=./.eslintrc index.js",
+    "build": "npx tsc",
+    "jasmine": "jasmine",
+    "test": "npm run build && npm run jasmine",
+    "start": "nodemon src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "eslint": "^8.8.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "express": "^4.17.1",
+    "jasmine": "^3.6.4",
+    "jasmine-spec-reporter": "^6.0.0",
+    "nodemon": "^2.0.6",
+    "prettier": "^2.5.1"
+   
+  },
+  "devDependencies": {
+    "typescript": "^4.0.5",
+    "@types/express": "^4.17.8",
+    "@types/jasmine": "^3.6.3",
+    "@types/node": "^14.14.6",
+    "ts-node": "^9.0.0"
+  }
+}
