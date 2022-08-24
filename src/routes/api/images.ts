@@ -74,7 +74,7 @@ const paramCheck = (req: Request, res: Response, next: NextFunction) => {
 async function resizer(req: Request, res: Response, next: NextFunction) {
   //console.log('start resizer middleware');
   // Check if the file exists in the thumbnails directory.
-
+  let errMsg = '';
   if (!existsSync(tumbnailsPath + req.query.filename)) {
     try {
       //  console.log('resize file' + req.query.filename);
@@ -85,10 +85,17 @@ async function resizer(req: Request, res: Response, next: NextFunction) {
         })
         .toFile(tumbnailsPath + req.query.filename);
     } catch (error) {
-      console.error('resizer error:' + error);
+      errMsg = error as string;
+      console.error('resizer error:' + errMsg.toString());
     }
   }
-  next();
+  if (errMsg !== '') {
+    //res.status(400).send(error as unknown as string);
+    res.status(500).send(errMsg.toString());
+    next(error);
+  } else {
+    next();
+  }
 }
 
 images.use(paramCheck);
