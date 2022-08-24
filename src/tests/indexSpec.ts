@@ -1,9 +1,16 @@
-//import newArr from '../index';
-//import newArr from '..';
+import app from '../index';
+
+import supertest from 'supertest';
 
 
-
-
+const request = supertest(app);
+describe('Test endpoint responses /api', () => {
+    it('gets the api endpoint', async (done) => {
+        const response = await request.get('/api');
+        expect(response.status).toBe(200);
+        done();
+    }
+)});
 //const numArr = [3, 4, 5, 6];
 //const wordArr = ['cat', 'dog', 'rabbit', 'bird'];
 /*

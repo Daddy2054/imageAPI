@@ -33,11 +33,13 @@ const sendThumbBack = function (
 const paramCheck = (req: Request, res: Response, next: NextFunction) => {
   //  console.log('start paramCheck middleware');
   let errMsg = '';
+  let errStatus = 500;
   if (
     req.query.filename == undefined &&
     req.query.width == undefined &&
     req.query.height == undefined
   ) {
+    errStatus = 200;
     errMsg =
       'welcome to image resizer! please,provide parameters: "?filename="file name"&width="width in px"heigth="heigth in px"';
 
@@ -49,6 +51,7 @@ const paramCheck = (req: Request, res: Response, next: NextFunction) => {
     req.query.height == undefined
   ) {
     if (errMsg === '') {
+      errStatus = 400;
       errMsg =
         'wrong parametes! "?filename="file name"&width="width in px"heigth="heigth in px"';
     }
@@ -57,6 +60,7 @@ const paramCheck = (req: Request, res: Response, next: NextFunction) => {
   }
   if (!existsSync(assetsPath + req.query.filename)) {
     if (errMsg === '') {
+      errStatus = 400;
       errMsg = `wrong filename! ${
         assetsPath + req.query.filename
       } do not exists!`;
@@ -67,7 +71,7 @@ const paramCheck = (req: Request, res: Response, next: NextFunction) => {
   if (errMsg === '') {
     next();
   } else {
-    res.status(400).send(errMsg);
+    res.status(errStatus).send(errMsg);
   }
 };
 
