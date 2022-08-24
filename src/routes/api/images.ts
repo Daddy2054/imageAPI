@@ -102,7 +102,7 @@ images.use(paramCheck);
 images.use(resizer);
 images.use(sendThumbBack);
 
-images.get('/', (req, res, next) => {
+images.get('/', (req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
