@@ -1,69 +1,102 @@
-import express from 'express';
-//import { resizer } from '../../utilities/resizer';
+import express, { NextFunction, Request, Response } from 'express';
+
 import sharp from 'sharp';
-import { constants, access } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { doesNotMatch } from 'node:assert';
+import { error } from 'node:console';
 
 const images = express.Router();
 const assetsPath = 'assets/full/';
 const tumbnailsPath = 'assets/tumbnails/';
 
-const sendThumbBack = function (req: any, res: any, next: any) {
+const sendThumbBack = function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  //console.log('start sendThumbBack middleware');
   const filename = req.query.filename as string;
   const absPath = path.resolve(tumbnailsPath, filename);
-  res.sendFile(absPath, function (err: any) {
+  res.sendFile(absPath, function (err: Error) {
     if (err) {
       console.error(err.stack);
       //res.status(500).send('Something broke!');
       //    next();
     } else {
-      console.log('Sent:' + filename);
+      //      console.log('Sent:' + filename);
+      next();
     }
   });
-  next();
+  //next();
 };
 
-const paramCheck = (req: any, res: any, next: any) => {
+const paramCheck = (req: Request, res: Response, next: NextFunction) => {
+  //  console.log('start paramCheck middleware');
+  let errMsg = '';
+  if (
+    req.query.filename == undefined &&
+    req.query.width == undefined &&
+    req.query.height == undefined
+  ) {
+    errMsg =
+      'welcome to image resizer! please,provide parameters: "?filename="file name"&width="width in px"heigth="heigth in px"';
+
+    next(error);
+  }
   if (
     req.query.filename == undefined ||
     req.query.width == undefined ||
     req.query.height == undefined
   ) {
-    res
-      .status(400)
-      .send(
-        'wrong parameters! "?filename="file name"&width="width in px"heigth="heigth in px"'
-      );
+    if (errMsg === '') {
+      errMsg =
+        'wrong parametes! "?filename="file name"&width="width in px"heigth="heigth in px"';
+    }
+
+    next(error);
   }
-  next();
+  if (!existsSync(assetsPath + req.query.filename)) {
+    if (errMsg === '') {
+      errMsg = `wrong filename! ${
+        assetsPath + req.query.filename
+      } do not exists!`;
+    }
+
+    next(error);
+  }
+  if (errMsg === '') {
+    next();
+  } else {
+    res.status(400).send(errMsg);
+  }
 };
 
-async function resizer(req: any, res: any, next: any) {
-  // Check if the file exists in the current directory.
+async function resizer(req: Request, res: Response, next: NextFunction) {
+  //console.log('start resizer middleware');
+  // Check if the file exists in the thumbnails directory.
 
-  access(tumbnailsPath + req.query.filename, constants.F_OK, (err) => {
-    if (!err) {
-      next();
+  if (!existsSync(tumbnailsPath + req.query.filename)) {
+    try {
+      //  console.log('resize file' + req.query.filename);
+      await sharp(assetsPath + req.query.filename)
+        .resize({
+          width: parseInt(req.query.width as string),
+          height: parseInt(req.query.height as string)
+        })
+        .toFile(tumbnailsPath + req.query.filename);
+    } catch (error) {
+      console.error('resizer error:' + error);
     }
-  });
-  try {
-    await sharp(assetsPath + req.query.filename)
-      .resize({
-        width: parseInt(req.query.width),
-        height: parseInt(req.query.height)
-      })
-      .toFile(tumbnailsPath + req.query.filename);
-    next();
-  } catch (error) {
-    console.log('resizer error:' + error);
   }
+  next();
 }
+
 images.use(paramCheck);
 images.use(resizer);
 images.use(sendThumbBack);
 
 images.get('/', (req, res, next) => {
-  //next();
+  next();
 });
+
 export default images;
