@@ -1,40 +1,44 @@
 import app from '../../../index';
-// import images from '../../../../src/routes/api/images';
 import supertest from 'supertest';
-import { Response } from 'express';
 
 const request = supertest(app);
 describe('Test endpoint responses /api/images', () => {
-    it('gets the api/images endpoint', async (done) => {
-        const response = await request.get('/api/images');
-        expect(response.status).toBe(200);
-        done();
-    }
-)
-it('gets the api/images and missing parameters', async (done) => {
-    const missingParam = '?filename=sammy.png'
-    const response = await request
-    .get('/api/images'+missingParam)
+  it('gets the api/images endpoint', async () => {
+    const response = await request.get('/api/images');
+    expect(response.status).toBe(200);
+  });
 
+  it('gets the api/images and missing parameters', async () => {
+    const missingParam = '?filename=sammy.png';
+    const response = await request.get('/api/images/' + missingParam);
     expect(response.status).toBe(400);
-    done();
-})
+  });
+});
 
+describe('Test for image processing', () => {
+  const imageFile = 'sammy.png'; //image file
+  const notImageFile = 'package.json'; //not image file
+  const notExistingFile = '12345.jpg'; //not existing file
+  const sizeParam = '&width=100&height=100'; //thumbnail size
 
-/*
-check image processing:
-1.
-check that thumbnail file do not exist
-get parameters
-check that thumbnail file exist 
+  it('test for correct imagefile processing', async () => {
+    const response = await request.get(
+      '/api/images/' + `?filename=${imageFile}${sizeParam}`
+    );
+    expect(response.status).toBe(200);
+  });
 
-2. error: get parameters with wrong format
-check error
+  it('test for not image processing error', async () => {
+    const response = await request.get(
+      '/api/images/' + `?filename=${notImageFile}${sizeParam}`
+    );
+    expect(response.status).toBe(400);
+  });
 
-
-check send image:
-get right params 
-check response with content type image and status 200
-
-*/
+  it('test for not existing file processing error', async () => {
+    const response = await request.get(
+      '/api/images/' + `?filename=${notExistingFile}${sizeParam}`
+    );
+    expect(response.status).toBe(400);
+  });
 });

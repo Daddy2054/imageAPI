@@ -95,7 +95,7 @@ async function resizer(req: Request, res: Response, next: NextFunction) {
   }
   if (errMsg !== '') {
     //res.status(400).send(error as unknown as string);
-    res.status(500).send(errMsg.toString());
+    res.status(400).send(errMsg.toString());
     next(error);
   } else {
     next();
