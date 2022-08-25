@@ -41,7 +41,7 @@ const paramCheck = (req: Request, res: Response, next: NextFunction) => {
   ) {
     errStatus = 200;
     errMsg =
-      'welcome to image resizer! please,provide parameters: "?filename="file name"&width="width in px"heigth="heigth in px"';
+      'welcome to image resizer! please,provide parameters: "?filename="file name"&width="width in px"height="height in px"';
 
     next(error);
   }
@@ -53,7 +53,7 @@ const paramCheck = (req: Request, res: Response, next: NextFunction) => {
     if (errMsg === '') {
       errStatus = 400;
       errMsg =
-        'wrong parametes! "?filename="file name"&width="width in px"heigth="heigth in px"';
+        'wrong parametes! "?filename="file name"&width="width in px"height="height in px"';
     }
 
     next(error);

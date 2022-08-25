@@ -8,7 +8,7 @@ describe('Test endpoint responses /api/images', () => {
     expect(response.status).toBe(200);
   });
 
-  it('gets the api/images and missing parameters', async () => {
+  it('test for missing parameters', async () => {
     const missingParam = '?filename=sammy.png';
     const response = await request.get('/api/images/' + missingParam);
     expect(response.status).toBe(400);
