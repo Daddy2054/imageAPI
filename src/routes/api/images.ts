@@ -1,13 +1,13 @@
 import express, { NextFunction, Request, Response } from 'express';
 
 import sharp from 'sharp';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { error } from 'node:console';
 
 const images = express.Router();
 const assetsPath = 'assets/full/';
-const tumbnailsPath = 'assets/tumbnails/';
+const thumbnailsPath = 'assets/thumbnails/';
 
 const sendThumbBack = function (
   req: Request,
@@ -16,7 +16,7 @@ const sendThumbBack = function (
 ) {
   //console.log('start sendThumbBack middleware');
   const filename = req.query.filename as string;
-  const absPath = path.resolve(tumbnailsPath, filename);
+  const absPath = path.resolve(thumbnailsPath, filename);
   res.sendFile(absPath, function (err: Error) {
     if (err) {
       console.error(err.stack);
@@ -79,7 +79,10 @@ async function resizer(req: Request, res: Response, next: NextFunction) {
   //console.log('start resizer middleware');
   // Check if the file exists in the thumbnails directory.
   let errMsg = '';
-  if (!existsSync(tumbnailsPath + req.query.filename)) {
+  if (!existsSync(thumbnailsPath)) {
+    mkdirSync(thumbnailsPath);
+  }
+  if (!existsSync(thumbnailsPath + req.query.filename)) {
     try {
       //  console.log('resize file' + req.query.filename);
       await sharp(assetsPath + req.query.filename)
@@ -87,7 +90,7 @@ async function resizer(req: Request, res: Response, next: NextFunction) {
           width: parseInt(req.query.width as string),
           height: parseInt(req.query.height as string)
         })
-        .toFile(tumbnailsPath + req.query.filename);
+        .toFile(thumbnailsPath + req.query.filename);
     } catch (error) {
       errMsg = error as string;
       console.error('resizer error:' + errMsg.toString());

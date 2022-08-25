@@ -1,5 +1,6 @@
 import app from '../../../index';
 import supertest from 'supertest';
+import { existsSync, rmSync } from 'node:fs';
 
 const request = supertest(app);
 describe('Test endpoint responses /api/images', () => {
@@ -17,11 +18,15 @@ describe('Test endpoint responses /api/images', () => {
 
 describe('Test for image processing', () => {
   const imageFile = 'sammy.png'; //image file
+  const thumbnailsPath = 'assets/thumbnails/';
   const notImageFile = 'package.json'; //not image file
   const notExistingFile = '12345.jpg'; //not existing file
   const sizeParam = '&width=100&height=100'; //thumbnail size
 
   it('test for correct imagefile processing', async () => {
+    if (existsSync(thumbnailsPath + imageFile)) {
+      rmSync(thumbnailsPath + imageFile);
+    }
     const response = await request.get(
       '/api/images/' + `?filename=${imageFile}${sizeParam}`
     );
