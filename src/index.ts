@@ -5,10 +5,10 @@ import routes from './routes';
 const app = express();
 const port = 3000;
 
-app.use('/api', routes);
+void app.use('/api', routes);
 
 // start the Express server
-app.listen(port, () => {
+void app.listen(port, () => {
   console.log(`server started at http://localhost:${port}`);
 });
 export default app;

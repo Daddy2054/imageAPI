@@ -4,7 +4,7 @@
   "description": "Image Processing API project, full stack javascript developer, udacity",
   "main": "index.ts",
   "scripts": {
-    "prettier": "prettier --config .prettierrc \"**/*.js\" --write",
+    "prettier": "prettier --config .prettierrc \"**/*.ts\" --write",
     "lint": "eslint . --ext .ts",
     "build": "npx tsc",
     "jasmine": "jasmine",
