@@ -1,9 +1,11 @@
-import app from '../../../index';
 import supertest from 'supertest';
+import app from '../../../index';
+
 import { existsSync, rmSync } from 'node:fs';
 
 const request = supertest(app);
-describe('Test endpoint responses /api/images', () => {
+
+describe('Test endpoint responses /api/images', function () {
   it('gets the api/images endpoint', async () => {
     const response = await request.get('/api/images');
     expect(response.status).toBe(200);
@@ -16,29 +18,13 @@ describe('Test endpoint responses /api/images', () => {
   });
 });
 
-describe('Test for image processing', () => {
+describe('Test for errors when image processing.', function () {
   const imageFile = 'sammy.png'; //image file
-  const thumbnailsPath = 'assets/thumbnails/';
-  const notImageFile = 'package.json'; //not image file
+
   const notExistingFile = '12345.jpg'; //not existing file
-  const sizeParam = '&width=100&height=100'; //thumbnail size
-
-  it('test for correct imagefile processing', async () => {
-    if (existsSync(thumbnailsPath + imageFile)) {
-      rmSync(thumbnailsPath + imageFile);
-    }
-    const response = await request.get(
-      '/api/images/' + `?filename=${imageFile}${sizeParam}`
-    );
-    expect(response.status).toBe(200);
-  });
-
-  it('test for not image processing error', async () => {
-    const response = await request.get(
-      '/api/images/' + `?filename=${notImageFile}${sizeParam}`
-    );
-    expect(response.status).toBe(400);
-  });
+  const sizeParamWidth = '100'; //thumbnail width
+  const sizeParamWHeight = '100'; //thumbnail height
+  const sizeParam = `&width=${sizeParamWidth}&height=${sizeParamWHeight}`;
 
   it('test for not existing file processing error', async () => {
     const response = await request.get(

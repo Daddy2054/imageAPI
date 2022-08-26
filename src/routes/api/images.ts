@@ -1,36 +1,14 @@
 import express, { NextFunction, Request, Response } from 'express';
-
-import sharp from 'sharp';
-import { existsSync, mkdirSync } from 'node:fs';
+import resizer from '../../utilities/resizer';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { error } from 'node:console';
 
 const images = express.Router();
 const assetsPath = 'assets/full/';
-const thumbnailsPath = 'assets/thumbnails/';
+const thumbnailsRoot = 'assets/thumbnails/';
 
-const sendThumbBack = function (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  //console.log('start sendThumbBack middleware');
-  const filename = req.query.filename as string;
-  const absPath = path.resolve(thumbnailsPath, filename);
-  res.sendFile(absPath, function (err: Error) {
-    if (err) {
-      console.error(err.stack);
-      //res.status(500).send('Something broke!');
-      //    next();
-    } else {
-      //      console.log('Sent:' + filename);
-      next();
-    }
-  });
-  //next();
-};
-
-const paramCheck = (req: Request, res: Response, next: NextFunction) => {
+const paramCheck = (req: Request, res: Response, next: NextFunction): void => {
   //  console.log('start paramCheck middleware');
   let errMsg = '';
   let errStatus = 500;
@@ -41,7 +19,7 @@ const paramCheck = (req: Request, res: Response, next: NextFunction) => {
   ) {
     errStatus = 200;
     errMsg =
-      'welcome to image resizer! please,provide parameters: "?filename="file name"&width="width in px"height="height in px"';
+      'welcome to image resizer! please,provide parameters: "?filename="file name"&width="width in px"&height="height in px"';
 
     next(error);
   }
@@ -53,7 +31,7 @@ const paramCheck = (req: Request, res: Response, next: NextFunction) => {
     if (errMsg === '') {
       errStatus = 400;
       errMsg =
-        'wrong parametes! "?filename="file name"&width="width in px"height="height in px"';
+        'wrong parametes! Please use: "?filename="file name"&width="width in px"&height="height in px"';
     }
 
     next(error);
@@ -75,41 +53,40 @@ const paramCheck = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-async function resizer(req: Request, res: Response, next: NextFunction) {
-  //console.log('start resizer middleware');
-  // Check if the file exists in the thumbnails directory.
-  let errMsg = '';
-  if (!existsSync(thumbnailsPath)) {
-    mkdirSync(thumbnailsPath);
-  }
-  if (!existsSync(thumbnailsPath + req.query.filename)) {
-    try {
-      //  console.log('resize file' + req.query.filename);
-      await sharp(assetsPath + req.query.filename)
-        .resize({
-          width: parseInt(req.query.width as string),
-          height: parseInt(req.query.height as string)
-        })
-        .toFile(thumbnailsPath + req.query.filename);
-    } catch (error) {
-      errMsg = error as string;
-      console.error('resizer error:' + errMsg.toString());
-    }
-  }
-  if (errMsg !== '') {
-    //res.status(400).send(error as unknown as string);
-    res.status(400).send(errMsg.toString());
-    next(error);
-  } else {
-    next();
+async function sendThumbBack(req: Request, res: Response, next: NextFunction) {
+  //console.log('start sendThumbBack middleware');
+  const thumbnailsPath = (thumbnailsRoot +
+    req.query.width +
+    'X' +
+    req.query.height +
+    '/') as string;
+
+  const absPath = path.resolve(
+    thumbnailsPath,
+    req.query.filename as string
+  ) as string;
+  const params = {
+    inputFilename: req.query.filename as string,
+    width: req.query.width as string,
+    height: req.query.height as string
+  };
+  await resizer(params);
+  if (existsSync((thumbnailsPath + req.query.filename) as string)) {
+    res.sendFile(absPath, function (err: Error) {
+      if (err) {
+        console.error(err.stack);
+      } else {
+        next();
+      }
+    });
   }
 }
 
-images.use(paramCheck);
-images.use(resizer);
-images.use(sendThumbBack);
+void images.use(paramCheck);
 
-images.get('/', (req: Request, res: Response, next: NextFunction) => {
+void images.use(sendThumbBack);
+
+images.get('/', (req: Request, res: Response, next: NextFunction): void => {
   next();
 });
 
