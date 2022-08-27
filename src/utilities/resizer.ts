@@ -18,6 +18,7 @@ async function resizer(params: {
     '/') as string;
   let errMsg = '';
 
+  // Check if the file exists in the thumbnails directory.
   if (!existsSync(thumbnailsRoot)) {
     mkdirSync(thumbnailsRoot);
   }
@@ -25,7 +26,6 @@ async function resizer(params: {
     mkdirSync(thumbnailsPath);
   }
   if (!existsSync(thumbnailsPath + inputFilename)) {
-    // Check if the file exists in the thumbnails directory.
     try {
       await sharp(assetsPath + inputFilename)
         .resize({
@@ -38,5 +38,6 @@ async function resizer(params: {
       console.error('resizer error:' + errMsg.toString());
     }
   }
+  return errMsg;
 }
 export default resizer;

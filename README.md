@@ -1,12 +1,12 @@
 # Image Processing API
 
 Udacity Nanodegree: Full Stack Javascript Developer
-chapter: Backend Development with Node.js author:daddy2054
+course: Backend Development with Node.js student:daddy2054
 
 ## Application Architecture
 
 An API endpoint for resizing images, using express.js as server.
-with request to endpoint, resized file is written to thumbnail folder.
+With request to the endpoint, resized file is written to thumbnail folder.
 
 ## How to Deploy
 
@@ -43,7 +43,7 @@ http://localhost:3000/api/images/?filename=sammy.png&width=100&height=100
 
 1. drop image file in folder "assets/full"
 2. make an request to an endpoint with correct parameters
-3. Find resized file in folder "assets/thumbnail"
+3. Find resized file in folder "assets/thumbnail/(new_size)"
 4. In case the resized file already exists, it will be in the response, without invocation of resizing function.
 5. in case the user's error, status code 400 will be returned with error message shown to the user.
 
@@ -60,6 +60,6 @@ $ npm run lint
 1. endpoint: "/api"
 2. endpoint "/api/images"
 3. parameters missing
-4. image processing
-5. processing error for wrong file type (package.json, already in folder)
-6. error for file do not exist
+4. error for file do not exist
+5. image processing
+6. incorrect parameters("a","0","-1")

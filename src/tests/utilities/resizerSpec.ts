@@ -5,6 +5,7 @@ describe('Test for image processing.', function () {
   const thumbnailsRoot = 'assets/thumbnails/';
   const sizeParamWidth = '100'; //thumbnail width
   const sizeParamWHeight = '100'; //thumbnail height
+  //const sizeParamWHeight = '100'; //thumbnail height
   const thumbnailsPath = (thumbnailsRoot +
     sizeParamWidth +
     'X' +

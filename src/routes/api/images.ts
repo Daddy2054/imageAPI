@@ -1,8 +1,8 @@
 import express, { NextFunction, Request, Response } from 'express';
 import resizer from '../../utilities/resizer';
+import { sizeValidator } from '../../utilities/sizevalidator';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { error } from 'node:console';
 
 const images = express.Router();
 const assetsPath = 'assets/full/';
@@ -21,7 +21,7 @@ const paramCheck = (req: Request, res: Response, next: NextFunction): void => {
     errMsg =
       'welcome to image resizer! please,provide parameters: "?filename="file name"&width="width in px"&height="height in px"';
 
-    next(error);
+    //next(error);
   }
   if (
     req.query.filename == undefined ||
@@ -34,7 +34,15 @@ const paramCheck = (req: Request, res: Response, next: NextFunction): void => {
         'wrong parametes! Please use: "?filename="file name"&width="width in px"&height="height in px"';
     }
 
-    next(error);
+    //next(error);
+  }
+  if (!sizeValidator(req.query.width as string, req.query.height as string)) {
+    if (errMsg === '') {
+      errStatus = 400;
+      errMsg = 'wrong parametes! Please use only numbers for image size';
+    }
+
+    // next(error);
   }
   if (!existsSync(assetsPath + req.query.filename)) {
     if (errMsg === '') {
@@ -44,7 +52,7 @@ const paramCheck = (req: Request, res: Response, next: NextFunction): void => {
       } do not exists!`;
     }
 
-    next(error);
+    //next(error);
   }
   if (errMsg === '') {
     next();
@@ -65,6 +73,13 @@ async function sendThumbBack(req: Request, res: Response, next: NextFunction) {
     thumbnailsPath,
     req.query.filename as string
   ) as string;
+  const pattern = /[^0-9]/g;
+  if (
+    pattern.test(req.query.width as string) ||
+    pattern.test(req.query.height as string)
+  ) {
+    console.error('wrong parametes! Please use only numbers for image size');
+  }
   const params = {
     inputFilename: req.query.filename as string,
     width: req.query.width as string,
@@ -85,7 +100,6 @@ async function sendThumbBack(req: Request, res: Response, next: NextFunction) {
 void images.use(paramCheck);
 
 void images.use(sendThumbBack);
-
 images.get('/', (req: Request, res: Response, next: NextFunction): void => {
   next();
 });
