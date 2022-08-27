@@ -4,10 +4,10 @@ import images from './api/images';
 
 const routes = express.Router();
 
-routes.get('/', (req: Request, res: Response) => {
+void routes.get('/', (req: Request, res: Response) => {
   res.send('main api route');
 });
 
-routes.use('/images', images);
+void routes.use('/images', images);
 
 export default routes;

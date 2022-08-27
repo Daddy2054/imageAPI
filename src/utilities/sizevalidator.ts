@@ -1,4 +1,4 @@
-export const sizeValidator = function (str1: string, str2: string) {
+export const sizeValidator = function (str1: string, str2: string): boolean {
   const pattern1 = /^0/; // match 0 at the start
   const pattern2 = /\D/; // match any non digit, including minus at the start
 

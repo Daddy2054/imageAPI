@@ -9,7 +9,7 @@ const incorrectSizeParamWHeight3 = '600f'; //thumbnail height incorrect
 const incorrectSizeParamWidth4 = '-100'; //thumbnail width incorrect
 const incorrectSizeParamWHeight4 = '-200'; //thumbnail height incorrect
 
-describe('Test for size parameters validation', function () {
+describe('Tests for size parameters validation', function () {
   it('test for incorrect size parameter: "a","b"', function () {
     const response = sizeValidator(
       incorrectSizeParamWidth1,

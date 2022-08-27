@@ -9,7 +9,6 @@ const assetsPath = 'assets/full/';
 const thumbnailsRoot = 'assets/thumbnails/';
 
 const paramCheck = (req: Request, res: Response, next: NextFunction): void => {
-  //  console.log('start paramCheck middleware');
   let errMsg = '';
   let errStatus = 500;
   if (
@@ -20,8 +19,6 @@ const paramCheck = (req: Request, res: Response, next: NextFunction): void => {
     errStatus = 200;
     errMsg =
       'welcome to image resizer! please,provide parameters: "?filename="file name"&width="width in px"&height="height in px"';
-
-    //next(error);
   }
   if (
     req.query.filename == undefined ||
@@ -33,16 +30,12 @@ const paramCheck = (req: Request, res: Response, next: NextFunction): void => {
       errMsg =
         'wrong parametes! Please use: "?filename="file name"&width="width in px"&height="height in px"';
     }
-
-    //next(error);
   }
   if (!sizeValidator(req.query.width as string, req.query.height as string)) {
     if (errMsg === '') {
       errStatus = 400;
       errMsg = 'wrong parametes! Please use only numbers for image size';
     }
-
-    // next(error);
   }
   if (!existsSync(assetsPath + req.query.filename)) {
     if (errMsg === '') {
@@ -51,8 +44,6 @@ const paramCheck = (req: Request, res: Response, next: NextFunction): void => {
         assetsPath + req.query.filename
       } do not exists!`;
     }
-
-    //next(error);
   }
   if (errMsg === '') {
     next();
@@ -62,7 +53,6 @@ const paramCheck = (req: Request, res: Response, next: NextFunction): void => {
 };
 
 async function sendThumbBack(req: Request, res: Response, next: NextFunction) {
-  //console.log('start sendThumbBack middleware');
   const thumbnailsPath = (thumbnailsRoot +
     req.query.width +
     'X' +
@@ -73,13 +63,7 @@ async function sendThumbBack(req: Request, res: Response, next: NextFunction) {
     thumbnailsPath,
     req.query.filename as string
   ) as string;
-  const pattern = /[^0-9]/g;
-  if (
-    pattern.test(req.query.width as string) ||
-    pattern.test(req.query.height as string)
-  ) {
-    console.error('wrong parametes! Please use only numbers for image size');
-  }
+
   const params = {
     inputFilename: req.query.filename as string,
     width: req.query.width as string,
